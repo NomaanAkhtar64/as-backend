@@ -10,9 +10,14 @@ Search = namedtuple("Search", ["found", "employee"])
 
 
 class Employee(models.Model):
-    name = models.CharField(max_length=100)
-    gross_salary = models.IntegerField()
-    mac_address = models.CharField(max_length=17, unique=True)
+    first_name = models.CharField(max_length=100)
+    last_name = models.CharField(max_length=100)
+    wage_per_hour = models.IntegerField()
+    contact_number = models.CharField(max_length=20)
+    date_of_birth = models.DateField()
+    joining_date = models.DateField()
+    brand_of_device = models.CharField(max_length=150)
+    mac_address = models.CharField(max_length=17, unique=True, blank=True, null=True)
 
     @classmethod
     def verify_mac_address(mac_address):
@@ -27,4 +32,4 @@ class Employee(models.Model):
             return Search(False, None)
 
     def __str__(self):
-        return self.name
+        return f"{self.first_name} {self.last_name}"

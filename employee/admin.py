@@ -3,7 +3,12 @@ from .models import Employee
 
 
 class EmployeeAdmin(admin.ModelAdmin):
-    list_display = ["name", "gross_salary", "mac_address"]
+    list_display = [
+        "first_name",
+        "last_name",
+        "wage_per_hour",
+        "mac_address",
+    ]
 
 
 admin.site.register(Employee, EmployeeAdmin)

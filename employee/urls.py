@@ -1,7 +1,7 @@
 from rest_framework import routers
-from .views import AttendanceViewset
+from employee.views import EmployeeViewSet
 
 router = routers.SimpleRouter()
-router.register(r"attendance", AttendanceViewset)
+router.register(r"employee", EmployeeViewSet)
 
 urlpatterns = router.urls

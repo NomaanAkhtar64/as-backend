@@ -21,4 +21,4 @@ class Attendance(models.Model):
             return False
 
     def __str__(self):
-        return self.employee.name
+        return f"Attendance: {self.date} {self.employee.first_name} {self.employee.last_name}"

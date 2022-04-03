@@ -39,6 +39,8 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "employee.apps.EmployeeConfig",
     "attendance.apps.AttendanceConfig",
+    "holiday.apps.HolidayConfig",
+    "admin_system.apps.AdminSystemConfig",
     "rest_framework",
 ]
 
