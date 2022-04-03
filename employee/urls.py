@@ -1,5 +1,5 @@
 from rest_framework import routers
-from employee.views import EmployeeViewSet
+from .views import EmployeeViewSet
 
 router = routers.SimpleRouter()
 router.register(r"employee", EmployeeViewSet)
