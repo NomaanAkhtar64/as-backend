@@ -1,0 +1,17 @@
+[
+  {
+    "name": "Employee 1",
+    "gross_salary": 10000,
+    "mac_address": "5A-7E-08-A8-50-39"
+  },
+  {
+    "name": "Employee 2",
+    "gross_salary": 20000,
+    "mac_address": "38-B7-B5-D9-09-4C"
+  },
+  {
+    "name": "Employee 3",
+    "gross_salary": 30000,
+    "mac_address": "9E-D8-D2-C5-F0-D9"
+  }
+]
