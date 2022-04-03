@@ -25,24 +25,40 @@ SECRET_KEY = "django-insecure-g!wod_9x1*g0=v%1#8_)ihotfv6o%3$jcwt=m1j7sfymsgea(v
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = ["*"]
 
 # Application definition
 
-INSTALLED_APPS = [
+DJANGO_APPS = [
     "django.contrib.admin",
+    "django.contrib.sites",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+]
+
+EXTERNAL_APPS = [
+    "allauth",
+    "allauth.account",
+    "rest_auth",
+    "rest_auth.registration",
+    'rest_framework',
+    "rest_framework.authtoken",
+    'corsheaders',
+    # third party packages come here
+]
+
+LOCAL_APPS = [
     "employee.apps.EmployeeConfig",
     "attendance.apps.AttendanceConfig",
     "holiday.apps.HolidayConfig",
     "admin_system.apps.AdminSystemConfig",
-    "rest_framework",
+    # your custom apps come here
 ]
+
+INSTALLED_APPS = DJANGO_APPS + EXTERNAL_APPS + LOCAL_APPS
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -52,6 +68,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
 ]
 
 ROOT_URLCONF = "attendance_system.urls"
@@ -85,6 +102,30 @@ DATABASES = {
     }
 }
 
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework.authentication.BaseAuthentication",
+        "rest_framework.authentication.TokenAuthentication",
+        # "rest_framework.authentication.SessionAuthentication",
+    ),
+}
+
+AUTHENTICATION_BACKENDS = (
+    "allauth.account.auth_backends.AuthenticationBackend",
+    # "django.contrib.auth.backends.ModelBackend",
+)
+
+REST_SESSION_LOGIN = True
+
+ACCOUNT_AUTHENTICATION_METHOD = "email"
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_USERNAME_REQUIRED = False
+ACCOUNT_EMAIL_VERIFICATION = "none"
+
+CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOW_CREDENTIALS = True
+
+SITE_ID = 1
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators

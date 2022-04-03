@@ -18,6 +18,8 @@ class Employee(models.Model):
     joining_date = models.DateField()
     brand_of_device = models.CharField(max_length=150)
     mac_address = models.CharField(max_length=17, unique=True, blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)
 
     @classmethod
     def verify_mac_address(mac_address):

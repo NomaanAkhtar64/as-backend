@@ -11,3 +11,8 @@ class Holiday(models.Model):
     type = models.CharField(max_length=32, choices=HOLIDAY_TYPE)
     start_time = models.TimeField(blank=True, null=True)
     end_time = models.TimeField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)
+
+    def __str__(self):
+        return self.name

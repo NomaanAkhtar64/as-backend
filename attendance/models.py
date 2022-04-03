@@ -11,6 +11,8 @@ class Attendance(models.Model):
     status = models.CharField(max_length=10, choices=ATTENDANCE_CHOICES)
     checked_in = models.TimeField(null=True, blank=True)
     checked_out = models.TimeField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)
 
     @classmethod
     def has_marked_todays_attendance(employee):
