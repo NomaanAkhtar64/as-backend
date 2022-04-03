@@ -4,12 +4,12 @@ from employee.models import Employee
 
 ATTENDANCE_CHOICES = [("Paid Leave", "Paid Leave"), ("Present", "Present")]
 
-# Create your models here.
+
 class Attendance(models.Model):
     employee = models.ForeignKey(to=Employee, on_delete=models.PROTECT)
     date = models.DateField(auto_created=True)
     status = models.CharField(max_length=10, choices=ATTENDANCE_CHOICES)
-    checked_in = models.TimeField(auto_created=True)
+    checked_in = models.TimeField(null=True, blank=True)
     checked_out = models.TimeField(null=True, blank=True)
 
     @classmethod
@@ -19,3 +19,6 @@ class Attendance(models.Model):
             return True
         except Attendance.DoesNotExist:
             return False
+
+    def __str__(self):
+        return self.employee.name

@@ -8,7 +8,7 @@ MAC_ADDRESS_REGEX = re.compile(
 )
 Search = namedtuple("Search", ["found", "employee"])
 
-# Create your models here.
+
 class Employee(models.Model):
     name = models.CharField(max_length=100)
     gross_salary = models.IntegerField()
