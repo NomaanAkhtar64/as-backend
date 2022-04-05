@@ -2,6 +2,7 @@ import re
 from datetime import datetime
 from collections import namedtuple
 from django.db import models
+from django.contrib.auth.models import User
 
 MAC_ADDRESS_REGEX = re.compile(
     "^(((\d|([a-f]|[A-F])){2}:){5}(\d|([a-f]|[A-F])){2})$|^(((\d|([a-f]|[A-F])){2}-){5}(\d|([a-f]|[A-F])){2})$|^$"
@@ -10,6 +11,7 @@ Search = namedtuple("Search", ["found", "employee"])
 
 
 class Employee(models.Model):
+    user = models.OneToOneField(to=User, on_delete=models.CASCADE)
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
     wage_per_hour = models.IntegerField()

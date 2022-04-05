@@ -6,7 +6,7 @@ ATTENDANCE_CHOICES = [("Paid Leave", "Paid Leave"), ("Present", "Present")]
 
 
 class Attendance(models.Model):
-    employee = models.ForeignKey(to=Employee, on_delete=models.PROTECT)
+    employee = models.ForeignKey(to=Employee, on_delete=models.CASCADE)
     date = models.DateField(auto_created=True)
     status = models.CharField(max_length=10, choices=ATTENDANCE_CHOICES)
     checked_in = models.TimeField(null=True, blank=True)
