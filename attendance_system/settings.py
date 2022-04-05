@@ -44,9 +44,9 @@ EXTERNAL_APPS = [
     "allauth.account",
     "rest_auth",
     "rest_auth.registration",
-    'rest_framework',
+    "rest_framework",
     "rest_framework.authtoken",
-    'corsheaders',
+    "corsheaders",
     # third party packages come here
 ]
 
@@ -104,15 +104,18 @@ DATABASES = {
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
-        "rest_framework.authentication.BaseAuthentication",
+        # "rest_framework.authentication.BaseAuthentication",
         "rest_framework.authentication.TokenAuthentication",
         # "rest_framework.authentication.SessionAuthentication",
     ),
 }
+REST_AUTH_SERIALIZERS = {
+    "USER_DETAILS_SERIALIZER": "admin_system.serializers.UserDetailSerializer"
+}
 
 AUTHENTICATION_BACKENDS = (
     "allauth.account.auth_backends.AuthenticationBackend",
-    # "django.contrib.auth.backends.ModelBackend",
+    "django.contrib.auth.backends.ModelBackend",
 )
 
 REST_SESSION_LOGIN = True
