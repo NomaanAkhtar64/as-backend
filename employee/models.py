@@ -18,10 +18,9 @@ class Employee(models.Model):
     contact_number = models.CharField(max_length=20)
     date_of_birth = models.DateField()
     joining_date = models.DateField()
+    leaving_date = models.DateField(blank=True, null=True, default=None)
     brand_of_device = models.CharField(max_length=150)
     mac_address = models.CharField(max_length=17, unique=True, blank=True, null=True)
-    created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
-    updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)
 
     @classmethod
     def verify_mac_address(mac_address):
