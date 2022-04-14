@@ -62,6 +62,7 @@ def markable_attendance(request):
     for employee in Employee.objects.all():
         outobj = {
             "id": employee.id,
+            "name": employee.name,
             "has_checkin": False,
             "has_checkout": False,
         }
