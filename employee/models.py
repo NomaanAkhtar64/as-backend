@@ -43,3 +43,4 @@ class PartialEmployee(models.Model):
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
     brand_of_device = models.CharField(max_length=150)
+    applied = models.DateField(auto_created=True)

@@ -16,7 +16,7 @@ from attendance.serializers import AttendanceSerializer
 from employee.permissions import IsOwnerOrAdmin
 from .models import Employee, PartialEmployee
 from attendance.models import Attendance
-from .serializers import EmployeeSerializer
+from .serializers import EmployeeSerializer, PartialEmployeeSerializer
 
 tz = ZoneInfo(settings.TIME_ZONE)
 
@@ -25,6 +25,12 @@ class EmployeeViewSet(viewsets.ModelViewSet):
     queryset = Employee.objects.all()
     serializer_class = EmployeeSerializer
     permission_classes = [IsAuthenticated]
+
+
+class PartialEmployeeViewSet(viewsets.ModelViewSet):
+    queryset = PartialEmployee.objects.all()
+    serializer_class = PartialEmployeeSerializer
+    permission_classes = [IsAdminUser]
 
 
 @api_view(["GET"])

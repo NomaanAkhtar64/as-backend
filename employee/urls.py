@@ -1,7 +1,9 @@
 from django.urls import path
 from rest_framework import routers
+
 from .views import (
     EmployeeViewSet,
+    PartialEmployeeViewSet,
     employee_attendance,
     markable_attendance,
     mark_attendance,
@@ -10,6 +12,7 @@ from .views import (
 
 router = routers.SimpleRouter()
 router.register(r"employee", EmployeeViewSet)
+router.register(r"registrations", PartialEmployeeViewSet)
 
 urlpatterns = [
     path("markable_attendance/", markable_attendance),
