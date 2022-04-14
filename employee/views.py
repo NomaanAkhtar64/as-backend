@@ -7,12 +7,14 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework import status
 from rest_framework.response import Response
 from django.conf import settings
+from django.contrib.auth.models import User
+import secrets
 
 # LOCAL
 from admin_system.models import AdminConfig
 from attendance.serializers import AttendanceSerializer
 from employee.permissions import IsOwnerOrAdmin
-from .models import Employee
+from .models import Employee, PartialEmployee
 from attendance.models import Attendance
 from .serializers import EmployeeSerializer
 
@@ -62,7 +64,7 @@ def markable_attendance(request):
     for employee in Employee.objects.all():
         outobj = {
             "id": employee.id,
-            "name": employee.name,
+            "name": str(employee),
             "has_checkin": False,
             "has_checkout": False,
         }
@@ -110,3 +112,20 @@ def mark_attendance(request, id):
     return Response(
         data=f'Marked Attendance for Employee: {employee} for Date: {date.strftime("%d-%m-%Y")}'
     )
+
+
+@api_view(["POST"])
+def employee_signup(request):
+    email = request.data["email"]
+    password = request.data["password"]
+    device = request.data["device"]
+    first_name = request.data["first_name"]
+    last_name = request.data["last_name"]
+    user = User.objects.create_user(secrets.token_hex(16), email, password)
+    user.is_active = False
+    user.save()
+    PartialEmployee.objects.create(
+        user=user, first_name=first_name, last_name=last_name, brand_of_device=device
+    )
+
+    return Response(data="REGISTERED EMPLOYEE", status=status.HTTP_200_OK)

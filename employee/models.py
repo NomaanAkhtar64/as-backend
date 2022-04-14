@@ -36,3 +36,10 @@ class Employee(models.Model):
 
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
+
+
+class PartialEmployee(models.Model):
+    user = models.OneToOneField(to=User, on_delete=models.CASCADE)
+    first_name = models.CharField(max_length=100)
+    last_name = models.CharField(max_length=100)
+    brand_of_device = models.CharField(max_length=150)

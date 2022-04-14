@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Employee
+from .models import Employee, PartialEmployee
 import datetime
 
 
@@ -24,3 +24,9 @@ class EmployeeSerializer(serializers.ModelSerializer):
             "leaving_date",
             "employee_status",
         )
+
+
+class PartialEmployeeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PartialEmployee
+        fields = "__all__"
