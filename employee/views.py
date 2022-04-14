@@ -1,11 +1,14 @@
 # MODULES
 import datetime as dt
-from zoneinfo import ZoneInfo
+from backports.zoneinfo import ZoneInfo
+from django.views import View
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework import status
 from rest_framework.response import Response
+from django.http import HttpResponse
+from django.template.loader import render_to_string
 from django.conf import settings
 from django.contrib.auth.models import User
 import secrets
@@ -17,6 +20,7 @@ from employee.permissions import IsOwnerOrAdmin
 from .models import Employee, PartialEmployee
 from attendance.models import Attendance
 from .serializers import EmployeeSerializer, PartialEmployeeSerializer
+from .utils import html_to_pdf
 
 tz = ZoneInfo(settings.TIME_ZONE)
 
@@ -36,7 +40,7 @@ class PartialEmployeeViewSet(viewsets.ModelViewSet):
 @api_view(["GET"])
 @permission_classes([IsOwnerOrAdmin])
 def employee_attendance(request, id=None):
-    if id == None:
+    if id is None:
         employee = Employee.objects.get(user=request.user.id)
     else:
         employee = Employee.objects.get(id=id)
@@ -54,7 +58,7 @@ def employee_attendance(request, id=None):
         days = 0
     attendance = Attendance.objects.filter(
         employee=employee,
-        date__gte=(date - dt.datetime.timedelta(days=days)),
+        date__gte=(date - dt.timedelta(days=days)),
         date__lte=date,
     ).order_by("-date")
 
@@ -135,3 +139,12 @@ def employee_signup(request):
     )
 
     return Response(data="REGISTERED EMPLOYEE", status=status.HTTP_200_OK)
+
+
+class GeneratePdf(View):
+    def get(self, request, *args, **kwargs):
+        data = Employee.objects.get(id=request.id)
+        open('templates/temp.html', "w").write(render_to_string('employee_report.html', {'data': data}))
+        # Converting the HTML template into a PDF file
+        pdf = html_to_pdf('temp.html')
+        return HttpResponse(pdf, content_type='application/pdf')

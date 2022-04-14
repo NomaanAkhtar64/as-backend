@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Employee Report</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: Verdana, Geneva, Tahoma, sans-serif;
+      }
+      .header {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        background-color: rgba(0, 0, 0, 0.8);
+        color: white;
+        padding: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="employee-report">
+      <div class="header">
+        <div class="head-item">
+          <h1>Company Title</h1>
+        </div>
+        <div class="head-item">
+          <h4>{{data.user.username}}</h4>
+        </div>
+      </div>
+      <div class="report-data"></div>
+    </div>
+  </body>
+</html>

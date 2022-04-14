@@ -1,8 +1,8 @@
 import re
-from datetime import datetime
 from collections import namedtuple
-from django.db import models
+
 from django.contrib.auth.models import User
+from django.db import models
 
 MAC_ADDRESS_REGEX = re.compile(
     "^(((\d|([a-f]|[A-F])){2}:){5}(\d|([a-f]|[A-F])){2})$|^(((\d|([a-f]|[A-F])){2}-){5}(\d|([a-f]|[A-F])){2})$|^$"
@@ -43,4 +43,7 @@ class PartialEmployee(models.Model):
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
     brand_of_device = models.CharField(max_length=150)
-    applied = models.DateField(auto_created=True)
+    applied = models.DateField(auto_created=True, null=True, blank=True)
+
+    def __str__(self):
+        return self.user.username

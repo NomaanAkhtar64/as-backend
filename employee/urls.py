@@ -8,6 +8,7 @@ from .views import (
     markable_attendance,
     mark_attendance,
     employee_signup,
+    GeneratePdf,
 )
 
 router = routers.SimpleRouter()
@@ -20,4 +21,5 @@ urlpatterns = [
     path("employee_attendance/", employee_attendance),
     path("employee_signup/", employee_signup),
     path("employee/<int:id>/attendance/", employee_attendance),
+    path("report/<int:id/", GeneratePdf),
 ] + router.urls
