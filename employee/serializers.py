@@ -23,6 +23,8 @@ class EmployeeSerializer(serializers.ModelSerializer):
             "joining_date",
             "leaving_date",
             "employee_status",
+            "user",
+            "date_of_birth",
         )
 
 

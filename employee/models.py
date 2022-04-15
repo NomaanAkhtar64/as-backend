@@ -1,6 +1,8 @@
 import re
 from datetime import datetime
 from collections import namedtuple
+from zoneinfo import ZoneInfo
+from django.conf import settings
 from django.db import models
 from django.contrib.auth.models import User
 
@@ -10,11 +12,26 @@ MAC_ADDRESS_REGEX = re.compile(
 Search = namedtuple("Search", ["found", "employee"])
 
 
+def get_now_date():
+    return datetime.now(tz=ZoneInfo(settings.TIME_ZONE)).date()
+
+
+class PartialEmployee(models.Model):
+    user = models.OneToOneField(to=User, on_delete=models.CASCADE)
+    first_name = models.CharField(max_length=100)
+    last_name = models.CharField(max_length=100)
+    brand_of_device = models.CharField(max_length=150)
+    applied = models.DateField(auto_created=True, default=get_now_date)
+    date_of_birth = models.DateField()
+    contact = models.CharField(max_length=50)
+    ip = models.CharField(max_length=50)
+
+
 class Employee(models.Model):
     user = models.OneToOneField(to=User, on_delete=models.CASCADE)
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
-    wage_per_hour = models.IntegerField()
+    wage_per_hour = models.FloatField()
     contact_number = models.CharField(max_length=20)
     date_of_birth = models.DateField()
     joining_date = models.DateField()
@@ -37,10 +54,12 @@ class Employee(models.Model):
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
 
+    def save(self, *arg, **kw) -> None:
+        if not self.pk:
+            print("CREATING")
 
-class PartialEmployee(models.Model):
-    user = models.OneToOneField(to=User, on_delete=models.CASCADE)
-    first_name = models.CharField(max_length=100)
-    last_name = models.CharField(max_length=100)
-    brand_of_device = models.CharField(max_length=150)
-    applied = models.DateField(auto_created=True)
+            # GET MAC ADDRESS BY MATCHING IP
+            #
+
+            PartialEmployee.objects.get(user=self.user.id).delete()
+        return super().save(*arg, **kw)

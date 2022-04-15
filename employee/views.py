@@ -32,6 +32,27 @@ class PartialEmployeeViewSet(viewsets.ModelViewSet):
     serializer_class = PartialEmployeeSerializer
     permission_classes = [IsAdminUser]
 
+    def destroy(self, request, *args, **kwargs):
+        try:
+            if "complete" in request.GET:
+                User.objects.get(
+                    pk=PartialEmployee.objects.get(pk=kwargs["pk"]).user.id
+                ).delete()
+            else:
+                PartialEmployee.objects.get(pk=kwargs["pk"]).delete()
+        except PartialEmployee.DoesNotExist:
+            return Response(data="ID not exists", status=status.HTTP_200_OK)
+        return Response(data="Deleted", status=status.HTTP_200_OK)
+
+
+def get_client_ip(request):
+    x_forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR")
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(",")[0]
+    else:
+        ip = request.META.get("REMOTE_ADDR")
+    return ip
+
 
 @api_view(["GET"])
 @permission_classes([IsOwnerOrAdmin])
@@ -54,7 +75,7 @@ def employee_attendance(request, id=None):
         days = 0
     attendance = Attendance.objects.filter(
         employee=employee,
-        date__gte=(date - dt.datetime.timedelta(days=days)),
+        date__gte=(date - dt.timedelta(days=days)),
         date__lte=date,
     ).order_by("-date")
 
@@ -127,11 +148,19 @@ def employee_signup(request):
     device = request.data["device"]
     first_name = request.data["first_name"]
     last_name = request.data["last_name"]
+    dob = request.data["date_of_birth"]
+    contact = request.data["contact"]
     user = User.objects.create_user(secrets.token_hex(16), email, password)
     user.is_active = False
     user.save()
     PartialEmployee.objects.create(
-        user=user, first_name=first_name, last_name=last_name, brand_of_device=device
+        user=user,
+        first_name=first_name,
+        last_name=last_name,
+        brand_of_device=device,
+        date_of_birth=dob,
+        contact=contact,
+        ip=get_client_ip(request),
     )
 
     return Response(data="REGISTERED EMPLOYEE", status=status.HTTP_200_OK)
