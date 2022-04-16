@@ -1,13 +1,15 @@
 from django.db import models
+import base64
+
 
 DAYS = (
-    ("MN", "Monday"),
-    ("TU", "Tuesday"),
-    ("WD", "Wednesday"),
-    ("TH", "Thursday"),
-    ("FR", "Friday"),
-    ("ST", "Saturday"),
-    ("SN", "Sunday"),
+    (1, "Monday"),
+    (2, "Tuesday"),
+    (3, "Wednesday"),
+    (4, "Thursday"),
+    (5, "Friday"),
+    (6, "Saturday"),
+    (7, "Sunday"),
 )
 
 
@@ -30,3 +32,9 @@ class AdminConfig(models.Model):
     class Meta:
         verbose_name = "Admin Config"
         verbose_name_plural = "Admin Config"
+
+
+class Company(models.Model):
+    name = models.CharField(max_length=100)
+    logo = models.ImageField()
+    address = models.TextField()

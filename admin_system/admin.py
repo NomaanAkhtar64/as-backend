@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import AdminConfig, WorkingDay
+from .models import AdminConfig, WorkingDay, Company
 
 
 class WorkingDayAdmin(admin.ModelAdmin):
@@ -8,3 +8,4 @@ class WorkingDayAdmin(admin.ModelAdmin):
 
 admin.site.register(WorkingDay, WorkingDayAdmin)
 admin.site.register(AdminConfig)
+admin.site.register(Company)

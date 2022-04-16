@@ -21,5 +21,5 @@ urlpatterns = [
     path("employee_attendance/", employee_attendance),
     path("employee_signup/", employee_signup),
     path("employee/<int:id>/attendance/", employee_attendance),
-    path("report/<int:id/", GeneratePdf),
+    path("report/<int:id>/<int:month>/<int:year>/", GeneratePdf.as_view()),
 ] + router.urls

@@ -7,11 +7,7 @@ class EmployeeSerializer(serializers.ModelSerializer):
     employee_status = serializers.SerializerMethodField()
 
     def get_employee_status(self, obj):
-        if obj.leaving_date == None:
-            return "Active"
-        if obj.leaving_date > datetime.datetime.now(tz=datetime.timezone.utc).date():
-            return "Active"
-        return "Ex-Employee"
+        return obj.status()
 
     class Meta:
         model = Employee

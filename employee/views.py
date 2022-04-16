@@ -14,7 +14,7 @@ from django.contrib.auth.models import User
 import secrets
 
 # LOCAL
-from admin_system.models import AdminConfig
+from admin_system.models import AdminConfig, Company
 from attendance.serializers import AttendanceSerializer
 from employee.permissions import IsOwnerOrAdmin
 from .models import Employee, PartialEmployee
@@ -24,11 +24,32 @@ from .utils import html_to_pdf
 
 tz = ZoneInfo(settings.TIME_ZONE)
 
+MONTH = {
+    1: "January",
+    2: "February",
+    3: "March",
+    4: "April",
+    5: "May",
+    6: "June",
+    7: "July",
+    8: "August",
+    9: "September",
+    10: "October",
+    11: "November",
+    12: "December",
+}
+
 
 class EmployeeViewSet(viewsets.ModelViewSet):
     queryset = Employee.objects.all()
     serializer_class = EmployeeSerializer
     permission_classes = [IsAuthenticated]
+
+    def create(self, request, *args, **kwargs):
+        user = User.objects.get(pk=request.data["user"])
+        user.is_active = True
+        user.save()
+        return super().create(request, *args, **kwargs)
 
 
 class PartialEmployeeViewSet(viewsets.ModelViewSet):
@@ -71,10 +92,10 @@ def employee_attendance(request, id=None):
     date = dt.datetime.now(tz=tz).date()
 
     if view_mode == "Month":
-        return Response(data=Attendance.by_month(employee), status=status.HTTP_200_OK)
+        return Response(data=Attendance.months(employee), status=status.HTTP_200_OK)
 
     elif view_mode == "Year":
-        return Response(data=Attendance.by_year(employee), status=status.HTTP_200_OK)
+        return Response(data=Attendance.years(employee), status=status.HTTP_200_OK)
 
     else:
         # LAST 7 DAYS
@@ -172,10 +193,27 @@ def employee_signup(request):
 
 
 class GeneratePdf(View):
-    def get(self, request, *args, **kwargs):
-        data = Employee.objects.get(id=request.id)
+    def get(self, request, id, month, year):
+        employee = Employee.objects.get(id=id)
+        attendance = Attendance.objects.all()
+        company = Company.objects.all()[0]
+        d = Attendance.by_month(employee, month, year)
+        salary = d["hours_worked"] * employee.wage_per_hour
         open("templates/temp.html", "w").write(
-            render_to_string("employee_report.html", {"data": data})
+            render_to_string(
+                "employee_report.html",
+                {
+                    "employee": employee,
+                    "attendance": attendance,
+                    "company": company,
+                    "month": MONTH[month],
+                    "year": year,
+                    "presents": d["presents"],
+                    "absents": d["absents"],
+                    "hours_worked": d["hours_worked"],
+                    "salary": salary,
+                },
+            )
         )
         # Converting the HTML template into a PDF file
         pdf = html_to_pdf("temp.html")

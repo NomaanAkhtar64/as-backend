@@ -1,4 +1,5 @@
 import re
+import datetime as dt
 from collections import namedtuple
 from zoneinfo import ZoneInfo
 from django.conf import settings
@@ -13,7 +14,7 @@ Search = namedtuple("Search", ["found", "employee"])
 
 
 def get_now_date():
-    return datetime.now(tz=ZoneInfo(settings.TIME_ZONE)).date()
+    return dt.datetime.now(tz=ZoneInfo(settings.TIME_ZONE)).date()
 
 
 class PartialEmployee(models.Model):
@@ -56,10 +57,15 @@ class Employee(models.Model):
 
     def save(self, *arg, **kw) -> None:
         if not self.pk:
-            print("CREATING")
 
             # GET MAC ADDRESS BY MATCHING IP
             #
 
             PartialEmployee.objects.get(user=self.user.id).delete()
         return super().save(*arg, **kw)
+
+    def status(self):
+        if self.leaving_date == None:
+            return "Active"
+        if self.leaving_date > dt.datetime.now(tz=ZoneInfo(settings.TIME_ZONE)).date():
+            return "Active"

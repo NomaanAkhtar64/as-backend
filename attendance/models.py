@@ -7,6 +7,7 @@ from attendance.filters import (
     YearAttendanceSerializer,
 )
 from employee.models import Employee
+from holiday.models import Holiday
 
 ATTENDANCE_CHOICES = [("Paid Leave", "Paid Leave"), ("Present", "Present")]
 
@@ -24,7 +25,9 @@ def hrs_diff(start, end):
 class Attendance(models.Model):
     employee = models.ForeignKey(to=Employee, on_delete=models.CASCADE)
     date = models.DateField(auto_created=True)
-    status = models.CharField(max_length=10, choices=ATTENDANCE_CHOICES)
+    status = models.CharField(
+        max_length=10, choices=ATTENDANCE_CHOICES, default="Present"
+    )
     checked_in = models.TimeField(null=True, blank=True)
     checked_out = models.TimeField(null=True, blank=True)
 
@@ -49,8 +52,19 @@ class Attendance(models.Model):
         return hours_worked
 
     @classmethod
-    def by_month(cls, employee):
+    def presents(cls, queryset):
+        presents = 0
+        for att in queryset:
+            if att.status == "Present":
+                presents += 1
+
+        return presents
+
+    @classmethod
+    def months(cls, employee):
         att = cls.objects.filter(employee=employee)
+        if len(att) == 0:
+            return []
         latest = att.order_by("-date")[0].date
         oldest = employee.joining_date
 
@@ -85,8 +99,31 @@ class Attendance(models.Model):
         return serializer.data
 
     @classmethod
-    def by_year(cls, employee):
+    def absents(cls, queryset, month, year):
+        absents = 0
+        return absents
+
+    @classmethod
+    def by_month(cls, employee, month, year):
+        presents = 0
+        hours_worked = 0
+        absents = 0
+        att = cls.objects.filter(
+            date__year=year,
+            date__month=month,
+            employee=employee,
+        )
+        if len(att) > 0:
+            hours_worked = cls.hours_worked(att)
+            presents = cls.presents(att)
+            absents = cls.absents(att, month, year)
+        return {"presents": presents, "hours_worked": hours_worked, "absents": absents}
+
+    @classmethod
+    def years(cls, employee):
         att = cls.objects.filter(employee=employee)
+        if len(att) == 0:
+            return []
         latest = att.order_by("-date")[0].date
         oldest = employee.joining_date
 
@@ -96,8 +133,7 @@ class Attendance(models.Model):
             year = oldest.year + y
 
             queryset = cls.objects.filter(
-                date__year__gte=year,
-                date__year__lte=year,
+                date__year=year,
                 employee=employee,
             )
 
