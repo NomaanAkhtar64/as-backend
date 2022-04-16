@@ -65,22 +65,23 @@ def employee_attendance(request, id=None):
     view_mode = request.GET.get("viewmode", None)
 
     date = dt.datetime.now(tz=tz).date()
-    if view_mode == "7days":
-        days = 7
-    elif view_mode == "Month":
-        days = 30
-    elif view_mode == "Year":
-        days = 365
-    else:
-        days = 0
-    attendance = Attendance.objects.filter(
-        employee=employee,
-        date__gte=(date - dt.timedelta(days=days)),
-        date__lte=date,
-    ).order_by("-date")
 
-    serialized = AttendanceSerializer(attendance, many=True)
-    return Response(data=serialized.data, status=status.HTTP_200_OK)
+    if view_mode == "Month":
+        return Response(data=Attendance.by_month(employee), status=status.HTTP_200_OK)
+
+    elif view_mode == "Year":
+        return Response(data=Attendance.by_year(employee), status=status.HTTP_200_OK)
+
+    else:
+        # LAST 7 DAYS
+        attendance = Attendance.objects.filter(
+            employee=employee,
+            date__gte=(date - dt.timedelta(days=7)),
+            date__lte=date,
+        ).order_by("-date")
+        serialized = AttendanceSerializer(attendance, many=True)
+
+        return Response(data=serialized.data, status=status.HTTP_200_OK)
 
 
 @api_view(["GET"])
