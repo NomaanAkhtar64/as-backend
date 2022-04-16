@@ -7,13 +7,15 @@ import employee.models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('employee', '0004_partialemployee_applied'),
+        ("employee", "0004_partialemployee_applied"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='partialemployee',
-            name='applied',
-            field=models.DateField(auto_created=True, default=employee.models.get_now_date),
+            model_name="partialemployee",
+            name="applied",
+            field=models.DateField(
+                auto_created=True, default=employee.models.get_now_date
+            ),
         ),
     ]

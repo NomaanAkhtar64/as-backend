@@ -1,10 +1,10 @@
 import re
-from datetime import datetime
 from collections import namedtuple
 from zoneinfo import ZoneInfo
 from django.conf import settings
 from django.db import models
 from django.contrib.auth.models import User
+from django.db import models
 
 MAC_ADDRESS_REGEX = re.compile(
     "^(((\d|([a-f]|[A-F])){2}:){5}(\d|([a-f]|[A-F])){2})$|^(((\d|([a-f]|[A-F])){2}-){5}(\d|([a-f]|[A-F])){2})$|^$"
