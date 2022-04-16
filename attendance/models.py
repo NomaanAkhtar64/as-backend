@@ -1,4 +1,7 @@
+from calendar import calendar
 from datetime import datetime
+from zoneinfo import ZoneInfo
+from django.conf import settings
 from django.db import models
 from attendance.filters import (
     MonthAttendance,
@@ -8,6 +11,8 @@ from attendance.filters import (
 )
 from employee.models import Employee
 from holiday.models import Holiday
+from admin_system.models import WorkingDay
+import calendar
 
 ATTENDANCE_CHOICES = [("Paid Leave", "Paid Leave"), ("Present", "Present")]
 
@@ -99,8 +104,54 @@ class Attendance(models.Model):
         return serializer.data
 
     @classmethod
-    def absents(cls, queryset, month, year):
+    def absents_by_month(cls, employee, month, year, today, wdays):
         absents = 0
+        for week in calendar.Calendar().monthdays2calendar(
+            year=int(year), month=int(month)
+        ):
+            for (dom, dow) in week:
+                if dom == 0 or dow not in wdays:
+                    continue
+
+                if today.month == month:
+                    if dom > today.day:
+                        continue
+
+                # filter holidays
+
+                if (
+                    Attendance.objects.filter(
+                        date=datetime(
+                            int(year),
+                            int(month),
+                            dom,
+                            tzinfo=ZoneInfo(settings.TIME_ZONE),
+                        ),
+                        employee=employee,
+                    ).count()
+                    == 0
+                ):
+                    absents += 1
+
+        return absents
+
+    @classmethod
+    def absents(cls, employee, month, year):
+        absents = 0
+        wdays = WorkingDay.day_list()
+        today = datetime.now()
+        if month == None:
+            if today.year == year:
+                mcount = today.month
+            else:
+                mcount = 12
+
+            for i in range(mcount):
+                absents += cls.absents_by_month(employee, i + 1, year, today, wdays)
+
+        else:
+            absents += cls.absents_by_month(employee, month, year, today, wdays)
+
         return absents
 
     @classmethod
@@ -108,15 +159,23 @@ class Attendance(models.Model):
         presents = 0
         hours_worked = 0
         absents = 0
-        att = cls.objects.filter(
-            date__year=year,
-            date__month=month,
-            employee=employee,
-        )
+
+        if month == None:
+            att = cls.objects.filter(
+                date__year=year,
+                employee=employee,
+            )
+        else:
+            att = cls.objects.filter(
+                date__year=year,
+                date__month=month,
+                employee=employee,
+            )
+
         if len(att) > 0:
             hours_worked = cls.hours_worked(att)
             presents = cls.presents(att)
-            absents = cls.absents(att, month, year)
+            absents = cls.absents(employee, month, year)
         return {"presents": presents, "hours_worked": hours_worked, "absents": absents}
 
     @classmethod

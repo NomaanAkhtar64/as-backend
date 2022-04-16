@@ -12,12 +12,12 @@ class IsOwnerOrAdmin(BasePermission):
         if request.user.is_staff:
             return True
 
-        if "/api/employee/" in request.path:
-            employee_id = int(
-                request.path.replace("/api/employee/", "").replace("/attendance/", "")
-            )
-            employee = Employee.objects.get(id=employee_id)
-            if employee.user != request.user.id:
-                return False
+        try:
+            if "id" in view.kwargs:
+                employee = Employee.objects.get(id=view.kwargs.get("id"))
+                if employee.user.id != request.user.id:
+                    return False
+            return True
 
-        return True
+        except Employee.DoesNotExist:
+            return False

@@ -35,7 +35,11 @@
       </div>
     </header>
     <h1 style="text-transform: uppercase">
+      {% if month %}
       <u>EMPLOYEE REPORT: {{month.upper}} {{year}}</u>
+      {% else %}
+      <u>YEARLY REPORT: {{year}}</u>
+      {% endif %}
     </h1>
     <table>
       <tbody>

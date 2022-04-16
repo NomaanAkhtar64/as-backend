@@ -193,12 +193,15 @@ def employee_signup(request):
 
 
 class GeneratePdf(View):
-    def get(self, request, id, month, year):
+    def get(self, request, year, id, month=None):
         employee = Employee.objects.get(id=id)
         attendance = Attendance.objects.all()
         company = Company.objects.all()[0]
         d = Attendance.by_month(employee, month, year)
         salary = d["hours_worked"] * employee.wage_per_hour
+        month_text = None
+        if month:
+            month_text = MONTH[month]
         open("templates/temp.html", "w").write(
             render_to_string(
                 "employee_report.html",
@@ -206,7 +209,7 @@ class GeneratePdf(View):
                     "employee": employee,
                     "attendance": attendance,
                     "company": company,
-                    "month": MONTH[month],
+                    "month": month_text,
                     "year": year,
                     "presents": d["presents"],
                     "absents": d["absents"],
