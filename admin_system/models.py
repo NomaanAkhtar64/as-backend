@@ -24,7 +24,7 @@ class WorkingDay(models.Model):
         dlist = []
         days = cls.objects.all()
         for d in days:
-            dlist.append(int(d.day))
+            dlist.append(int(d.day) - 1)
         return dlist
 
 

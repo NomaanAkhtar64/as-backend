@@ -218,6 +218,6 @@ class GeneratePdf(View):
                 },
             )
         )
-        # Converting the HTML template into a PDF file
+
         pdf = html_to_pdf("temp.html")
         return HttpResponse(pdf, content_type="application/pdf")

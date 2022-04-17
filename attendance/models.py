@@ -117,7 +117,21 @@ class Attendance(models.Model):
                     if dom > today.day:
                         continue
 
-                # filter holidays
+                if (
+                    Holiday.objects.filter(
+                        date__month=month, date__year=year, date__day=dom, repeats=False
+                    ).count()
+                    > 0
+                ):
+                    continue
+
+                if (
+                    Holiday.objects.filter(
+                        date__month=month, date__day=dom, repeats=True
+                    ).count()
+                    > 0
+                ):
+                    continue
 
                 if (
                     Attendance.objects.filter(

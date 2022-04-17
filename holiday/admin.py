@@ -4,11 +4,7 @@ from holiday.models import Holiday
 
 
 class HolidayAdmin(admin.ModelAdmin):
-    list_display = ["name", "repeats", "date", "type"]
-    list_filter = (
-        "type",
-        "repeats",
-    )
+    list_display = ["name", "repeats", "date"]
     search_fields = ["name", "date"]
 
 
