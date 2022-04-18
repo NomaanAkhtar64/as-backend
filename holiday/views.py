@@ -1,4 +1,3 @@
-from django.shortcuts import render
 from requests import Response
 from rest_framework.decorators import api_view
 
@@ -29,3 +28,16 @@ def get_holidays(request):
         data=HolidaySerializer(Holiday.objects.all(), many=True).data,
         status=status.HTTP_200_OK,
     )
+
+
+@api_view(["POST"])
+def create_holiday(request):
+    serializer = HolidaySerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(
+            data=serializer.data,
+            status=status.HTTP_200_OK,
+        )
+
+    return Response(data=serializer.data, status=status.HTTP_400_BAD_REQUEST)
