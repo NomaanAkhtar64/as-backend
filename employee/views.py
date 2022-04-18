@@ -138,30 +138,22 @@ def markable_attendance(request):
 @api_view(["POST"])
 @permission_classes([IsAdminUser])
 def mark_attendance(request, id):
-    current_time = dt.datetime.now(tz=tz).time()
     employee = Employee.objects.get(id=id)
     data = request.data
     date = dt.datetime.strptime(data["date"], "%Y-%m-%d").date()
-
+    print(data)
     try:
         attendance = Attendance.objects.get(employee=employee, date=date)
 
     except Attendance.DoesNotExist:
         attendance = Attendance.objects.create(employee=employee, date=date)
 
-    if data["mark"] == "checkin":
-        attendance.checked_in = current_time
-    elif data["mark"] == "checkout":
-        attendance.checked_out = current_time
-    elif data["mark"] == "both":
-        attendance.checked_in = current_time
-        attendance.checked_out = AdminConfig.objects.all()[0].end_time
-    else:
-        return Response(
-            data="mark option not a valid value", status=status.HTTP_400_BAD_REQUEST
-        )
-    attendance.save()
+    if "checkin" in data:
+        attendance.checked_in = data["checkin"]
+    if "checkout" in data:
+        attendance.checked_out = data["checkout"]
 
+    attendance.save()
     return Response(
         data=f'Marked Attendance for Employee: {employee} for Date: {date.strftime("%d-%m-%Y")}'
     )
