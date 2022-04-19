@@ -103,6 +103,42 @@ class Attendance(models.Model):
         )
         return serializer.data
 
+    def working_days(month, year):
+        working_days = 0
+        today = datetime.now()
+        wdays = WorkingDay.day_list()
+        for week in calendar.Calendar().monthdays2calendar(
+            year=int(year), month=int(month)
+        ):
+            for (dom, dow) in week:
+                if dom == 0:
+                    continue
+                if today.month == month and dom > today.day:
+                    continue
+                if (
+                    Holiday.objects.filter(
+                        date__month=month,
+                        date__year=year,
+                        date__day=dom,
+                        repeats=False,
+                    ).count()
+                    > 0
+                ):
+                    continue
+
+                if (
+                    Holiday.objects.filter(
+                        date__month=month, date__day=dom, repeats=True
+                    ).count()
+                    > 0
+                ):
+                    continue
+
+                if dow in wdays:
+                    working_days += 1
+
+        return working_days
+
     @classmethod
     def absents_by_month(cls, employee, month, year, today, wdays):
         absents = 0
@@ -152,8 +188,8 @@ class Attendance(models.Model):
     @classmethod
     def absents(cls, employee, month, year):
         absents = 0
-        wdays = WorkingDay.day_list()
         today = datetime.now()
+        wdays = WorkingDay.day_list()
         if month == None:
             if today.year == year:
                 mcount = today.month
