@@ -1,6 +1,6 @@
 # MODULES
 import datetime as dt
-from zoneinfo import ZoneInfo
+from backports.zoneinfo import ZoneInfo
 from django.views import View
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated, IsAdminUser

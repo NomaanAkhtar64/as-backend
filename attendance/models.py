@@ -1,6 +1,6 @@
 from calendar import calendar
 from datetime import datetime
-from zoneinfo import ZoneInfo
+from backports.zoneinfo import ZoneInfo
 from django.conf import settings
 from django.db import models
 from attendance.filters import (

@@ -1,7 +1,7 @@
 import re
 import datetime as dt
 from collections import namedtuple
-from zoneinfo import ZoneInfo
+from backports.zoneinfo import ZoneInfo
 from django.conf import settings
 from django.db import models
 from django.contrib.auth.models import User
