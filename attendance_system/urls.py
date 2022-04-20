@@ -9,3 +9,6 @@ urlpatterns = [
     path("api/", include("holiday.urls")),
     path("api/", include("chart.urls")),
 ]
+
+admin.site.site_header = "Pi-Tendance Admin"
+admin.site.index_title = "Pi-Tendance Features"
