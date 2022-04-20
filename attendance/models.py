@@ -27,6 +27,17 @@ def hrs_diff(start, end):
     return round(delta / 60)
 
 
+class Leave(models.Model):
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
+    reason = models.CharField(max_length=255)
+    date = models.DateField()
+    msg = models.TextField()
+    approved = models.BooleanField(default=False)
+
+    def __str__(self):
+        return str(self.employee) + " Leave"
+
+
 class Attendance(models.Model):
     employee = models.ForeignKey(to=Employee, on_delete=models.CASCADE)
     date = models.DateField(auto_created=True)
@@ -103,7 +114,8 @@ class Attendance(models.Model):
         )
         return serializer.data
 
-    def working_days(month, year):
+    @classmethod
+    def working_days(cls, month, year):
         working_days = 0
         today = datetime.now()
         wdays = WorkingDay.day_list()
@@ -164,6 +176,18 @@ class Attendance(models.Model):
                 if (
                     Holiday.objects.filter(
                         date__month=month, date__day=dom, repeats=True
+                    ).count()
+                    > 0
+                ):
+                    continue
+
+                if (
+                    Leave.objects.filter(
+                        employee=employee,
+                        date__month=month,
+                        date__year=year,
+                        date__day=dom,
+                        approved=True,
                     ).count()
                     > 0
                 ):
@@ -256,14 +280,3 @@ class Attendance(models.Model):
             many=True,
         )
         return serializer.data
-
-
-class Leave(models.Model):
-    employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
-    reason = models.CharField(max_length=255)
-    date = models.DateField()
-    msg = models.TextField()
-    approved = models.BooleanField(default=False)
-
-    def __str__(self):
-        return str(self.employee) + " Leave"
