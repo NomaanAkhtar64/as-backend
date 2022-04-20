@@ -99,11 +99,15 @@ def employee_attendance(request, id=None):
 
     else:
         # LAST 7 DAYS
-        attendance = Attendance.objects.filter(
-            employee=employee,
-            date__gte=(date - dt.timedelta(days=7)),
-            date__lte=date,
-        ).order_by("-date")
+        attendance = (
+            Attendance.objects.filter(
+                employee=employee,
+                date__gte=(date - dt.timedelta(days=7)),
+                date__lte=date,
+            )
+            .exclude(checked_out=None)
+            .order_by("-date")
+        )
         serialized = AttendanceSerializer(attendance, many=True)
 
         return Response(data=serialized.data, status=status.HTTP_200_OK)
@@ -141,12 +145,11 @@ def mark_attendance(request, id):
     employee = Employee.objects.get(id=id)
     data = request.data
     date = dt.datetime.strptime(data["date"], "%Y-%m-%d").date()
-    print(data)
     try:
         attendance = Attendance.objects.get(employee=employee, date=date)
 
     except Attendance.DoesNotExist:
-        attendance = Attendance.objects.create(employee=employee, date=date)
+        attendance = Attendance(employee=employee, date=date)
 
     if "checkin" in data:
         attendance.checked_in = data["checkin"]

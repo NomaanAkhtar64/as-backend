@@ -11,10 +11,10 @@ from attendance.filters import (
 )
 from employee.models import Employee
 from holiday.models import Holiday
-from admin_system.models import WorkingDay
+from admin_system.models import AdminConfig, WorkingDay
 import calendar
 
-ATTENDANCE_CHOICES = [("Paid Leave", "Paid Leave"), ("Present", "Present")]
+ATTENDANCE_CHOICES = [("Early", "Early"), ("Present", "Present"), ("Late", "Late")]
 
 
 def hrs_diff(start, end):
@@ -25,6 +25,16 @@ def hrs_diff(start, end):
         + (end.second - start.second) / 60.0
     )
     return round(delta / 60)
+
+
+def min_diff(start, end):
+    delta = (
+        (end.hour - start.hour) * 60
+        + end.minute
+        - start.minute
+        + (end.second - start.second) / 60.0
+    )
+    return round(delta)
 
 
 class Leave(models.Model):
@@ -41,11 +51,23 @@ class Leave(models.Model):
 class Attendance(models.Model):
     employee = models.ForeignKey(to=Employee, on_delete=models.CASCADE)
     date = models.DateField(auto_created=True)
-    status = models.CharField(
-        max_length=10, choices=ATTENDANCE_CHOICES, default="Present"
-    )
-    checked_in = models.TimeField(null=True, blank=True)
+    status = models.CharField(max_length=10, choices=ATTENDANCE_CHOICES)
+    checked_in = models.TimeField()
     checked_out = models.TimeField(null=True, blank=True)
+
+    def save(self, *arg, **kwargs):
+        if not self.id:
+            config = AdminConfig.objects.all()[0]
+            check_in = datetime.strptime(self.checked_in, "%H:%M:%S").time()
+            if check_in < config.start_time:
+                self.status = "Early"
+            else:
+                if min_diff(config.start_time, check_in) <= 30:
+                    self.status = "Present"
+                else:
+                    self.status = "Late"
+
+        super().save(*arg, **kwargs)
 
     @classmethod
     def has_marked_todays_attendance(employee):
@@ -61,10 +83,15 @@ class Attendance(models.Model):
     @classmethod
     def hours_worked(cls, queryset):
         hours_worked = 0
+        config = AdminConfig.objects.all()[0]
         if len(queryset) == 0:
             return 0
         for att in queryset:
-            hours_worked += hrs_diff(att.checked_in, att.checked_out)
+            if att.checked_out:
+                if att.status == "Present" or att.status == "Early":
+                    hours_worked += hrs_diff(config.start_time, att.checked_out)
+                else:
+                    hours_worked += hrs_diff(att.checked_in, att.checked_out)
         return hours_worked
 
     @classmethod
