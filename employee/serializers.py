@@ -1,6 +1,5 @@
 from rest_framework import serializers
 from .models import Employee, PartialEmployee
-import datetime
 
 
 class EmployeeSerializer(serializers.ModelSerializer):

@@ -256,3 +256,14 @@ class Attendance(models.Model):
             many=True,
         )
         return serializer.data
+
+
+class Leave(models.Model):
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
+    reason = models.CharField(max_length=255)
+    date = models.DateField()
+    msg = models.TextField()
+    approved = models.BooleanField(default=False)
+
+    def __str__(self):
+        return str(self.employee) + " Leave"
