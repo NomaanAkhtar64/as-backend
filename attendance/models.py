@@ -19,10 +19,10 @@ ATTENDANCE_CHOICES = [("Paid Leave", "Paid Leave"), ("Present", "Present")]
 
 def hrs_diff(start, end):
     delta = (
-        (end.hour - start.hour) * 60
-        + end.minute
-        - start.minute
-        + (end.second - start.second) / 60.0
+            (end.hour - start.hour) * 60
+            + end.minute
+            - start.minute
+            + (end.second - start.second) / 60.0
     )
     return round(delta / 60)
 
@@ -107,7 +107,7 @@ class Attendance(models.Model):
     def absents_by_month(cls, employee, month, year, today, wdays):
         absents = 0
         for week in calendar.Calendar().monthdays2calendar(
-            year=int(year), month=int(month)
+                year=int(year), month=int(month)
         ):
             for (dom, dow) in week:
                 if dom == 0 or dow not in wdays:
@@ -118,32 +118,32 @@ class Attendance(models.Model):
                         continue
 
                 if (
-                    Holiday.objects.filter(
-                        date__month=month, date__year=year, date__day=dom, repeats=False
-                    ).count()
-                    > 0
+                        Holiday.objects.filter(
+                            date__month=month, date__year=year, date__day=dom, repeats=False
+                        ).count()
+                        > 0
                 ):
                     continue
 
                 if (
-                    Holiday.objects.filter(
-                        date__month=month, date__day=dom, repeats=True
-                    ).count()
-                    > 0
+                        Holiday.objects.filter(
+                            date__month=month, date__day=dom, repeats=True
+                        ).count()
+                        > 0
                 ):
                     continue
 
                 if (
-                    Attendance.objects.filter(
-                        date=datetime(
-                            int(year),
-                            int(month),
-                            dom,
-                            tzinfo=ZoneInfo(settings.TIME_ZONE),
-                        ),
-                        employee=employee,
-                    ).count()
-                    == 0
+                        Attendance.objects.filter(
+                            date=datetime(
+                                int(year),
+                                int(month),
+                                dom,
+                                tzinfo=ZoneInfo(settings.TIME_ZONE),
+                            ),
+                            employee=employee,
+                        ).count()
+                        == 0
                 ):
                     absents += 1
 
@@ -154,7 +154,7 @@ class Attendance(models.Model):
         absents = 0
         wdays = WorkingDay.day_list()
         today = datetime.now()
-        if month == None:
+        if month is None:
             if today.year == year:
                 mcount = today.month
             else:
@@ -220,3 +220,14 @@ class Attendance(models.Model):
             many=True,
         )
         return serializer.data
+
+
+class Leave(models.Model):
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
+    reason = models.CharField(max_length=255)
+    date = models.DateField()
+    msg = models.TextField()
+    approved = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.employee.user.username

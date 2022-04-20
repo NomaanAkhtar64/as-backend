@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Attendance
+from .models import Attendance, Leave
 
 
 class AttendanceAdmin(admin.ModelAdmin):
@@ -8,4 +8,11 @@ class AttendanceAdmin(admin.ModelAdmin):
     search_fields = ['employee__username']
 
 
+class LeaveAdmin(admin.ModelAdmin):
+    list_display = ['employee', 'reason', 'date', 'approved']
+    list_filter = ['employee', 'approved', 'date']
+    search_fields = ['employee__username', 'reason']
+
+
 admin.site.register(Attendance, AttendanceAdmin)
+admin.site.register(Leave, LeaveAdmin)
