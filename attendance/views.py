@@ -15,6 +15,9 @@ class LeaveViewset(ModelViewSet):
     # permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
+        queryset = Leave.objects.all()
         if "approved" in self.request.query_params:
-            return Leave.objects.filter(approved=self.request.query_params["approved"])
-        return Leave.objects.all()
+            queryset = queryset.filter(approved=self.request.query_params["approved"])
+        if "employee" in self.request.query_params:
+            queryset = queryset.filter(employee=self.request.query_params["employee"])
+        return queryset
