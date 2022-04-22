@@ -20,6 +20,8 @@ class EmployeeSerializer(serializers.ModelSerializer):
             "employee_status",
             "user",
             "date_of_birth",
+            "brand_of_device",
+            "contact_number",
         )
 
 
