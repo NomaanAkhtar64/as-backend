@@ -7,6 +7,8 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.db import models
 
+from connection.models import Connection
+
 MAC_ADDRESS_REGEX = re.compile(
     "^(((\d|([a-f]|[A-F])){2}:){5}(\d|([a-f]|[A-F])){2})$|^(((\d|([a-f]|[A-F])){2}-){5}(\d|([a-f]|[A-F])){2})$|^$"
 )
@@ -60,8 +62,13 @@ class Employee(models.Model):
 
             # GET MAC ADDRESS BY MATCHING IP
             #
-
-            PartialEmployee.objects.get(user=self.user.id).delete()
+            p_employee = PartialEmployee.objects.get(user=self.user.id)
+            try:
+                conn = Connection.objects.get(ip=p_employee.ip)
+                self.mac_address = conn.mac
+            except Connection.DoesNotExist:
+                pass
+            p_employee.delete()
         return super().save(*arg, **kw)
 
     def status(self):
@@ -69,3 +76,4 @@ class Employee(models.Model):
             return "Active"
         if self.leaving_date > dt.datetime.now(tz=ZoneInfo(settings.TIME_ZONE)).date():
             return "Active"
+            PartialEmployee.objects.get(user=self.user.id).delete()

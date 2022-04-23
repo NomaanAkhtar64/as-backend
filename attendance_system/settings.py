@@ -55,7 +55,8 @@ LOCAL_APPS = [
     "attendance.apps.AttendanceConfig",
     "holiday.apps.HolidayConfig",
     "admin_system.apps.AdminSystemConfig",
-    "chart.apps.ChartConfig"
+    "chart.apps.ChartConfig",
+    'connection.apps.ConnectionConfig'
     # your custom apps come here
 ]
 
