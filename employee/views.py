@@ -70,13 +70,13 @@ class PartialEmployeeViewSet(viewsets.ModelViewSet):
         return Response(data="Deleted", status=status.HTTP_200_OK)
 
 
-def get_client_ip(request):
-    x_forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR")
-    if x_forwarded_for:
-        ip = x_forwarded_for.split(",")[0]
-    else:
-        ip = request.META.get("REMOTE_ADDR")
-    return ip
+# def get_client_ip(request):
+#     x_forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR")
+#     if x_forwarded_for:
+#         ip = x_forwarded_for.split(",")[0]
+#     else:
+#         ip = request.META.get("REMOTE_ADDR")
+#     return ip
 
 
 @api_view(["GET"])
@@ -171,6 +171,7 @@ def employee_signup(request):
     last_name = request.data["last_name"]
     dob = request.data["date_of_birth"]
     contact = request.data["contact"]
+    ip = request.data["ip"]
     user = User.objects.create_user(secrets.token_hex(16), email, password)
     user.is_active = False
     user.save()
@@ -181,7 +182,8 @@ def employee_signup(request):
         brand_of_device=device,
         date_of_birth=dob,
         contact=contact,
-        ip=get_client_ip(request),
+        ip=ip,
+        # ip=get_client_ip(request),
     )
 
     return Response(data="REGISTERED EMPLOYEE", status=status.HTTP_200_OK)
