@@ -174,9 +174,11 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 CORS_ALLOW_CREDENTIALS = True
 CORS_ORIGIN_ALLOW_ALL = False
 CORS_ORIGIN_WHITELIST = (
-    "http://0.0.0.0:3000",
-    "http://10.42.0.1:3000",
+    "http://192.168.0.23:3000",
+    "http://192.168.4.1:3000",
     "http://localhost:3000",
+    "http://10.42.0.1:3000",
+    "http://0.0.0.0:3000",
 )
 CORS_ALLOW_METHODS = [
     "DELETE",
