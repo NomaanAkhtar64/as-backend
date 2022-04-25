@@ -29,7 +29,7 @@ def main():
         )  # This line display the output of arp -n in a varimport csvvariable in lines
         lines = totalOutput.split("\n")
         for line in lines:
-            result = line.find("en0")  # finding device MAC
+            result = line.find("wlan0")  # finding device MAC
             # result = line.find("enp3s0")  # finding device MAC
             if result > 0:
                 userMACmatches = re.findall(

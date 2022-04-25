@@ -56,7 +56,7 @@ LOCAL_APPS = [
     "holiday.apps.HolidayConfig",
     "admin_system.apps.AdminSystemConfig",
     "chart.apps.ChartConfig",
-    'connection.apps.ConnectionConfig'
+    "connection.apps.ConnectionConfig"
     # your custom apps come here
 ]
 
@@ -127,8 +127,6 @@ ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_EMAIL_VERIFICATION = "none"
 
-CORS_ORIGIN_ALLOW_ALL = True
-CORS_ALLOW_CREDENTIALS = True
 
 SITE_ID = 1
 
@@ -173,8 +171,13 @@ MEDIA_ROOT = BASE_DIR / "media"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+CORS_ALLOW_CREDENTIALS = True
 CORS_ORIGIN_ALLOW_ALL = False
-CORS_ORIGIN_WHITELIST = ("http://localhost:3000",)
+CORS_ORIGIN_WHITELIST = (
+    "http://0.0.0.0:3000",
+    "http://10.42.0.1:3000",
+    "http://localhost:3000",
+)
 CORS_ALLOW_METHODS = [
     "DELETE",
     "GET",

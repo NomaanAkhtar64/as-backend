@@ -174,6 +174,7 @@ def employee_signup(request):
     user = User.objects.create_user(secrets.token_hex(16), email, password)
     user.is_active = False
     user.save()
+    print(get_client_ip(request))
     PartialEmployee.objects.create(
         user=user,
         first_name=first_name,

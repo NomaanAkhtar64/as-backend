@@ -3,7 +3,7 @@ from .models import Connection
 
 
 class ConnectionAdmin(admin.ModelAdmin):
-    pass
+    list_display = ["ip", "mac", "datetime"]
 
 
 admin.site.register(Connection, ConnectionAdmin)
