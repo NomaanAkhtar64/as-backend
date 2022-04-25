@@ -56,7 +56,8 @@ def get_attendance_percentage_chart(currentDate):
             Attendance.objects.filter(date__year=currentDate.year, date__month=m)
         )
         wdays = Attendance.working_days(year=currentDate.year, month=m)
-        data.append(presents / (wdays * ecount) * 100)
+        if wdays != 0 and ecount != 0:
+            data.append(presents / (wdays * ecount) * 100)
     return {
         "title": "Average Attendance %",
         "key": "bap",
