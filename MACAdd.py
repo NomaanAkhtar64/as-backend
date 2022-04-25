@@ -3,17 +3,21 @@
 import os
 import re  # regular expression lib
 import time
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, time as datetime_time
 from subprocess import Popen, PIPE
 
 from backports.zoneinfo import ZoneInfo
 import django
+
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "attendance_system.settings")
 django.setup()
 
 from django.conf import settings
 from connection.models import Connection
+from admin_system.models import AdminConfig
+from employee.models import Employee
+from attendance.models import Attendance
 
 
 def main():
@@ -45,6 +49,8 @@ def main():
 
 def createConnection(userMAC, userIP):
     cur = datetime.now(tz=ZoneInfo(settings.TIME_ZONE))
+    curtime = cur.time()
+    timestr = f"{curtime.hour}:{curtime.minute}:{curtime.second}"
     if (
         Connection.objects.filter(
             mac=userMAC,
@@ -56,15 +62,28 @@ def createConnection(userMAC, userIP):
         try:
             conn = Connection.objects.get(mac=userMAC)
             conn.ip = userIP
-            conn.datetime = cur
-            conn.save()
-
         except Connection.DoesNotExist:
-            Connection.objects.create(mac=userMAC, ip=userIP, datetime=cur)
+            conn = Connection.objects.create(mac=userMAC, ip=userIP, datetime=cur)
+            print(
+                f"CREATED CONNECTION MAC: {userMAC} IP: {userIP} date: {cur.date()} time:{timestr}"
+            )
 
-        print(
-            f"CREATED CONNECTION MAC: {userMAC} IP: {userIP} date: {cur.date()} time:{cur.time()}"
-        )
+        # MARK ATTENDANCE
+        try:
+            emp = Employee.objects.get(mac_address=conn.mac)
+            end_time = AdminConfig.objects.all()[0].end_time
+
+            if Attendance.objects.filter(date=cur, employee=emp).count() == 0:
+                atd = Attendance.objects.create(
+                    date=cur,
+                    employee=emp,
+                    checked_in=timestr,
+                    checked_out=end_time,
+                )
+                print(f"{str(emp)} ATTENDANCE MARKED AT {timestr}")
+
+        except Employee.DoesNotExist:
+            pass
 
 
 if __name__ == "__main__":
