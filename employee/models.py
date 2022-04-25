@@ -59,9 +59,9 @@ class Employee(models.Model):
 
     def save(self, *arg, **kw) -> None:
         if not self.pk:
-
-            # GET MAC ADDRESS BY MATCHING IP
-            #
+            """
+            GET MAC ADDRESS BY MATCHING IP
+            """
             p_employee = PartialEmployee.objects.get(user=self.user.id)
             try:
                 conn = Connection.objects.get(ip=p_employee.ip)
@@ -72,8 +72,7 @@ class Employee(models.Model):
         return super().save(*arg, **kw)
 
     def status(self):
-        if self.leaving_date == None:
+        if self.leaving_date is None:
             return "Active"
         if self.leaving_date > dt.datetime.now(tz=ZoneInfo(settings.TIME_ZONE)).date():
             return "Active"
-            PartialEmployee.objects.get(user=self.user.id).delete()

@@ -1,19 +1,18 @@
-from subprocess import Popen, PIPE
-from datetime import datetime, timedelta
-import time
-import re  # regular expression lib
-
 # import gspread # pip install gspread
 # import pyrebase
 import os
-import django
+import re  # regular expression lib
+import time
+from datetime import datetime, timedelta
+from subprocess import Popen, PIPE
+
 from backports.zoneinfo import ZoneInfo
-from django.conf import settings
-from django.db import connection
+import django
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "attendance_system.settings")
 django.setup()
 
+from django.conf import settings
 from connection.models import Connection
 
 
@@ -22,13 +21,14 @@ def main():
     # Running infinity loop to keep checking the Arp table
     while True:
         pid = Popen(
-            ["arp", "-a"], stdout=PIPE
+            ["arp", "-n"], stdout=PIPE
         )  # When the phone connects to hotspot MAC with IP is noted in ARP table
         totalOutput = pid.communicate()[0].decode(
             "ascii"
         )  # This line display the output of arp -n in a varimport csvvariable in lines
         lines = totalOutput.split("\n")
         for line in lines:
+            print(line)
             result = line.find("wlan0")  # finding device MAC
             # result = line.find("enp3s0")  # finding device MAC
             if result > 0:
@@ -67,7 +67,9 @@ def createConnection(userMAC, userIP):
         )
 
 
-if (
-    __name__ == "__main__"
-):  # This is where the program starts. GPP, as python does not have built-in main function, so we can create our own like this, so that we we dont get confused in dertermining local and global scope.
+if __name__ == "__main__":
+    """
+    This is where the program starts. GPP, as python does not have built-in main function,
+    so we can create our own like this, so that we don't get confused in determining local and global scope.
+    """
     main()
