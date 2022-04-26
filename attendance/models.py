@@ -51,21 +51,24 @@ class Leave(models.Model):
 class Attendance(models.Model):
     employee = models.ForeignKey(to=Employee, on_delete=models.CASCADE)
     date = models.DateField(auto_created=True)
-    status = models.CharField(max_length=10, choices=ATTENDANCE_CHOICES)
+    status = models.CharField(
+        max_length=10, choices=ATTENDANCE_CHOICES, blank=True, null=True
+    )
     checked_in = models.TimeField(null=True, blank=True)
     checked_out = models.TimeField(null=True, blank=True)
 
     def save(self, *arg, **kwargs):
-        if not self.id:
+        if not self.staus:
             config = AdminConfig.objects.all()[0]
-            check_in = datetime.strptime(self.checked_in, "%H:%M:%S").time()
-            if check_in < config.start_time:
-                self.status = "Early"
-            else:
-                if min_diff(config.start_time, check_in) <= 30:
-                    self.status = "Present"
+            if check_in:
+                check_in = datetime.strptime(self.checked_in, "%H:%M:%S").time()
+                if check_in < config.start_time:
+                    self.status = "Early"
                 else:
-                    self.status = "Late"
+                    if min_diff(config.start_time, check_in) <= 30:
+                        self.status = "Present"
+                    else:
+                        self.status = "Late"
 
         super().save(*arg, **kwargs)
 
