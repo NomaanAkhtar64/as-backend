@@ -60,7 +60,7 @@ class Attendance(models.Model):
     def save(self, *arg, **kwargs):
         if not self.status:
             config = AdminConfig.objects.all()[0]
-            if check_in:
+            if self.checked_in:
                 check_in = datetime.strptime(self.checked_in, "%H:%M:%S").time()
                 if check_in < config.start_time:
                     self.status = "Early"
