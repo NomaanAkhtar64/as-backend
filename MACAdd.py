@@ -81,7 +81,7 @@ def createConnection(userMAC, userIP):
             except Attendance.DoesNotExist:
                 atd = Attendance.objects.create(date=cur, employee=emp)
 
-            if not atd.checked_in and time_around(config.start_time, curtime, 1):
+            if atd.checked_in == None and time_around(config.start_time, curtime, 1):
                 atd.checked_in = timestr
                 print(f"{str(emp)} CHECKIN AT {timestr}")
 
