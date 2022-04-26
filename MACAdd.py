@@ -1,5 +1,3 @@
-# import gspread # pip install gspread
-# import pyrebase
 import os
 import re  # regular expression lib
 import time
@@ -17,7 +15,7 @@ from django.conf import settings
 from connection.models import Connection
 from admin_system.models import AdminConfig
 from employee.models import Employee
-from attendance.models import Attendance
+from attendance.models import Attendance, hrs_diff
 
 
 def main():
@@ -34,7 +32,6 @@ def main():
         for line in lines:
             print(line)
             result = line.find("wlan0")  # finding device MAC
-            # result = line.find("enp3s0")  # finding device MAC
             if result > 0:
                 userMACmatches = re.findall(
                     r"(?:[0-9a-fA-F]:?){12}", line
@@ -47,40 +44,52 @@ def main():
         time.sleep(5)
 
 
+def time_around(t1, t2, hrsdiff):
+    dt1 = datetime.combine(datetime.min, t1)
+    dt2 = datetime.combine(datetime.min, t2)
+    if dt1 > dt2:
+        return (dt1 - dt2) <= timedelta(hours=hrsdiff)
+    return (dt2 - dt1) <= timedelta(hours=hrsdiff)
+
+
 def createConnection(userMAC, userIP):
     cur = datetime.now(tz=ZoneInfo(settings.TIME_ZONE))
     curtime = cur.time()
     timestr = f"{curtime.hour}:{curtime.minute}:{curtime.second}"
-    if (
-        Connection.objects.filter(
-            mac=userMAC,
-            datetime__gte=cur - timedelta(minutes=20),
-        ).count()
-        # FINDS COUNT OF CONNECTION OBJECTS WITH GIVEN MAC ADDRESS CREATED IN THE LAST 20 MINUTES
-        == 0
-    ):
+
+    connections = Connection.objects.filter(
+        mac=userMAC, datetime__gte=cur - timedelta(minutes=1)
+    )
+
+    if connections.count() == 0:
         try:
             conn = Connection.objects.get(mac=userMAC)
             conn.ip = userIP
+            conn.save()
         except Connection.DoesNotExist:
-            conn = Connection.objects.create(mac=userMAC, ip=userIP, datetime=cur)
+            Connection.objects.create(mac=userMAC, ip=userIP, datetime=cur)
             print(
                 f"CREATED CONNECTION MAC: {userMAC} IP: {userIP} date: {cur.date()} time:{timestr}"
             )
 
         # MARK ATTENDANCE
         try:
-            emp = Employee.objects.get(mac_address=conn.mac)
-            end_time = AdminConfig.objects.all()[0].end_time
+            emp = Employee.objects.get(mac_address=userMAC)
+            config = AdminConfig.objects.all()[0]
+            try:
+                atd = Attendance.objects.get(date=cur, employee=emp)
+            except Attendance.DoesNotExist:
+                atd = Attendance.objects.create(date=cur, employee=emp)
 
-            if Attendance.objects.filter(date=cur, employee=emp).count() == 0:
-                atd = Attendance.objects.create(
-                    date=cur,
-                    employee=emp,
-                    checked_in=timestr,
-                    checked_out=end_time,
-                )
-                print(f"{str(emp)} ATTENDANCE MARKED AT {timestr}")
+            if time_around(config.start_time, curtime, 1):
+                atd.checked_in = timestr
+                print(f"{str(emp)} CHECKIN AT {timestr}")
+
+            if time_around(config.end_time, curtime, 1):
+                atd.checked_out = timestr
+                print(f"{str(emp)} CHECKIN AT {timestr}")
+
+            atd.save()
 
         except Employee.DoesNotExist:
             pass

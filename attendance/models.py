@@ -52,7 +52,7 @@ class Attendance(models.Model):
     employee = models.ForeignKey(to=Employee, on_delete=models.CASCADE)
     date = models.DateField(auto_created=True)
     status = models.CharField(max_length=10, choices=ATTENDANCE_CHOICES)
-    checked_in = models.TimeField()
+    checked_in = models.TimeField(null=True, blank=True)
     checked_out = models.TimeField(null=True, blank=True)
 
     def save(self, *arg, **kwargs):
