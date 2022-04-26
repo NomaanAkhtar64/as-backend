@@ -58,7 +58,7 @@ class Attendance(models.Model):
     checked_out = models.TimeField(null=True, blank=True)
 
     def save(self, *arg, **kwargs):
-        if not self.staus:
+        if not self.status:
             config = AdminConfig.objects.all()[0]
             if check_in:
                 check_in = datetime.strptime(self.checked_in, "%H:%M:%S").time()
